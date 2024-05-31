@@ -1,0 +1,37 @@
+{
+  "name": "mvenghaus/saloon-magento2-connector",
+  "description": "Saloon Connector for Magento 2",
+  "keywords": [
+    "saloon",
+    "saloonphp",
+    "magento",
+    "magento2"
+  ],
+  "homepage": "https://github.com/mvenghaus/saloon-magento2-connector",
+  "support": {
+    "issues": "https://github.com/mvenghaus/saloon-magento2-connector/issues",
+    "source": "https://github.com/mvenghaus/saloon-magento2-connector"
+  },
+  "license": "MIT",
+  "authors": [ 
+    {
+      "name": "Marcus Venghaus",
+      "email": "marcus.venghaus@inklammern.de",
+      "role": "Developer"
+    }
+  ],
+  "require": {
+    "php": "^8.2",
+    "saloonphp/saloon": "^3.7.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "Mvenghaus\\SaloonMagento2Connector\\": "src"
+    }
+  },
+  "config": {
+    "sort-packages": true
+  },
+  "minimum-stability": "stable",
+  "prefer-stable": true
+}
