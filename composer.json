@@ -29,6 +29,11 @@
       "Mvenghaus\\SaloonMagento2Connector\\": "src"
     }
   },
+  "autoload-dev": {
+    "psr-4": {
+      "Mvenghaus\\SaloonMagento2Connector\\Tests\\": "tests"
+    }
+  },
   "config": {
     "sort-packages": true
   },

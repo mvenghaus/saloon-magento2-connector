@@ -17,7 +17,7 @@ composer require mvenghaus/saloon-magento2-connector
 ```php
 
 $configuration = new Configuration(...);
-$connector = new Connector($configuration);
+$connector = new ApiConnector($configuration);
 
 $response = $connector->send(new Your_Request());
 ```
