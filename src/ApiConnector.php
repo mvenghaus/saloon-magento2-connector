@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mvenghaus\SaloonMagento2Connector;
 
 use Closure;
+use Saloon\Contracts\OAuthAuthenticator;
 use Saloon\Exceptions\Request\FatalRequestException;
 use Saloon\Exceptions\Request\RequestException;
 use Saloon\Exceptions\Request\Statuses\UnauthorizedException;
@@ -47,18 +48,20 @@ class ApiConnector extends Connector
         return new AuthConnector($this->configuration);
     }
 
-    public function auth(): void
+    public function resolveAuthenticator(): OAuthAuthenticator
     {
         if (empty($this->configuration->authenticator)) {
             $authenticator = $this->getAuthConnector()->updateAccessToken();
         } else {
             $authenticator = AccessTokenAuthenticator::unserialize($this->configuration->authenticator);
             if ($authenticator->hasExpired()) {
-                $this->getAuthConnector()->updateAccessToken();
+                $authenticator = $this->getAuthConnector()->updateAccessToken();
             }
         }
 
         $this->authenticate(new TokenAuthenticator($authenticator->getAccessToken()));
+
+        return $authenticator;
     }
 
     /**
@@ -72,13 +75,13 @@ class ApiConnector extends Connector
             return parent::send($request, $mockClient, $handleRetry);
         }
 
-        $this->auth();
+        $this->resolveAuthenticator();
 
         try {
             return parent::send($request, $mockClient, $handleRetry);
         } catch (UnauthorizedException) {
             $this->configuration->authenticator = null;
-            $this->auth();
+            $this->resolveAuthenticator();
         }
 
         return parent::send($request, $mockClient, $handleRetry);

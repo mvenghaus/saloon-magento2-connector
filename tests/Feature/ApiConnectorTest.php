@@ -23,11 +23,9 @@ it('retrieves access token if no authenticator is provided', function () {
     $apiConnector = Mockery::mock(ApiConnector::class, [$configuration])->makePartial();
     $apiConnector->shouldReceive('getAuthConnector')->andReturn($authConnectorMock);
 
-    $apiConnector->auth();
+    $authenticator = $apiConnector->resolveAuthenticator();
 
-    $autenticatorData = AccessTokenAuthenticator::unserialize($configuration->authenticator);
-
-    expect($autenticatorData->accessToken)->toBe('NEW_ACCESS_TOKEN');
+    expect($authenticator->getAccessToken())->toBe('NEW_ACCESS_TOKEN');
 });
 
 it('retrieves new access token if expired', function () {
@@ -51,11 +49,9 @@ it('retrieves new access token if expired', function () {
     $apiConnector = Mockery::mock(ApiConnector::class, [$configuration])->makePartial();
     $apiConnector->shouldReceive('getAuthConnector')->andReturn($authConnectorMock);
 
-    $apiConnector->auth();
+    $authenticator = $apiConnector->resolveAuthenticator();
 
-    $autenticatorData = AccessTokenAuthenticator::unserialize($configuration->authenticator);
-
-    expect($autenticatorData->accessToken)->toBe('NEW_ACCESS_TOKEN');
+    expect($authenticator->getAccessToken())->toBe('NEW_ACCESS_TOKEN');
 });
 
 it('does not refresh token if not expired', function () {
@@ -81,9 +77,7 @@ it('does not refresh token if not expired', function () {
     $apiConnector = Mockery::mock(ApiConnector::class, [$configuration])->makePartial();
     $apiConnector->shouldReceive('getAuthConnector')->andReturn($authConnectorMock);
 
-    $apiConnector->auth();
+    $authenticator = $apiConnector->resolveAuthenticator();
 
-    $autenticatorData = AccessTokenAuthenticator::unserialize($configuration->authenticator);
-
-    expect($autenticatorData->accessToken)->toBe('OLD_ACCESS_TOKEN');
+    expect($authenticator->getAccessToken())->toBe('OLD_ACCESS_TOKEN');
 });
