@@ -37,17 +37,15 @@ class AuthConnector extends Connector
         return $response->status() !== 200;
     }
 
-    public function updateAccessToken(): void
+    public function updateAccessToken(): OAuthAuthenticator
     {
         $authenticator = $this->getAccessToken();
-
-        $this->authenticate(new TokenAuthenticator($authenticator->getAccessToken()));
-
-        $this->configuration->authenticator = $authenticator->serialize();
 
         if ($this->configuration->authenticatorUpdateCallback instanceof Closure) {
             ($this->configuration->authenticatorUpdateCallback)($authenticator->serialize());
         }
+
+        return $authenticator;
     }
 
     public function resolveBaseUrl(): string

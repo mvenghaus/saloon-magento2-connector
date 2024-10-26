@@ -7,6 +7,7 @@ namespace Mvenghaus\SaloonMagento2Connector;
 use Closure;
 use Saloon\Exceptions\Request\FatalRequestException;
 use Saloon\Exceptions\Request\RequestException;
+use Saloon\Exceptions\Request\Statuses\UnauthorizedException;
 use Saloon\Http\Auth\AccessTokenAuthenticator;
 use Saloon\Http\Auth\TokenAuthenticator;
 use Saloon\Http\Connector;
@@ -49,25 +50,34 @@ class ApiConnector extends Connector
     public function auth(): void
     {
         if (empty($this->configuration->authenticator)) {
-            $this->getAuthConnector()->updateAccessToken();
+            $authenticator = $this->getAuthConnector()->updateAccessToken();
         } else {
             $authenticator = AccessTokenAuthenticator::unserialize($this->configuration->authenticator);
-
-            $this->authenticate(new TokenAuthenticator($authenticator->getAccessToken()));
-
             if ($authenticator->hasExpired()) {
                 $this->getAuthConnector()->updateAccessToken();
             }
         }
+
+        $this->authenticate(new TokenAuthenticator($authenticator->getAccessToken()));
     }
 
     /**
      * @throws FatalRequestException
      * @throws RequestException
+     * @throws UnauthorizedException
      */
     public function send(Request $request, ?MockClient $mockClient = null, ?callable $handleRetry = null): Response
     {
-        if ($this->getMockClient() === null) {
+        if ($this->getMockClient() !== null) {
+            return parent::send($request, $mockClient, $handleRetry);
+        }
+
+        $this->auth();
+
+        try {
+            return parent::send($request, $mockClient, $handleRetry);
+        } catch (UnauthorizedException) {
+            $this->configuration->authenticator = null;
             $this->auth();
         }
 
